@@ -1,8 +1,8 @@
 substitutions:
   name: "lounge-wt32-eth01"
   friendly_name: "Lounge"
+  global_update_interval: "1min"
   illuminance_update_interval: "2s"
-  hidden_ssid: "false"
   log_level: DEBUG
 
 dashboard_import:

@@ -39,14 +39,14 @@ i2c:
 
 light:
   - platform: status_led
-    name: ESP32 LED
+    name: ${name} ESP32 LED
     pin: GPIO14
     internal: False
     restore_mode: ALWAYS_OFF
 
 number:
   - platform: template
-    name: "Illuminance Offset"
+    name: "${friendly_name} Illuminance Offset"
     id: illuminance_offset_ui
     unit_of_measurement: "lx"
     min_value: -100
@@ -64,24 +64,63 @@ number:
 
 sensor:
   - platform: uptime
-    name: ${friendly_name} Uptime
+    name: "${friendly_name} Uptime"
   - platform: ccs811
     baseline: 0xD2B5
     eco2:
-      name: ${friendly_name} eCO2 Value
+      name: "${friendly_name} eCO2 Value"
     tvoc:
-      name: ${friendly_name} Total Volatile Organic Compound
+      name: "${friendly_name} Total Volatile Organic Compound"
     address: 0x5A
     update_interval: ${global_update_interval}
   - platform: bh1750
-    name: ${friendly_name} Illuminance
+    name: "${friendly_name} Illuminance"
     id: illuminance_sensor
     address: 0x23
     update_interval: ${illuminance_update_interval}
     filters:
       - lambda: "return x + id(illuminance_offset_ui).state;"
+  - platform: aht10
+    variant: AHT20
+    address: 0x38
+    temperature:
+      id: aht_temp
+      name: "${friendly_name} AHT Temperature"
+    humidity:
+      name: "${friendly_name} Humidity"
+    update_interval: ${global_update_interval}
+  - platform: bmp280
+    address: 0x77
+    temperature:
+      id: bmp_temp
+      name: "${friendly_name} BMP Temperature"
+    pressure:
+      name: "${friendly_name} Pressure"
+    update_interval: ${global_update_interval}
+  - platform: template
+    id: tem_avg   
+    name: "${friendly_name} Temperature"
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    lambda: |-
+      float sum = 0;
+      uint16_t cnt = 0;
+      if (!std::isnan(id(aht_temp).state)) {
+        sum += id(aht_temp).state;
+        cnt += 1;
+      }
+      if (!std::isnan(id(bmp_temp).state)) {
+        sum += id(bmp_temp).state;
+        cnt += 1;
+      }
+      if (cnt == 0) {
+        return NAN;
+      } else {
+        return (sum / cnt);
+      }
+    update_interval: ${global_update_interval}
 
 button:
   - platform: restart
     icon: mdi:power-cycle
-    name: ${name} Reboot
+    name: "${name} Reboot"

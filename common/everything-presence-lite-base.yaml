@@ -1,14 +1,10 @@
 esphome:
   name: ${name}
-  comment: Everything Presence Lite
   friendly_name: ${friendly_name}
   name_add_mac_suffix: True
-  project: 
-    name: EverythingSmartTechnology.Everything Presence Lite
-    version: "1.0.1"
 
 esp32:
-  board: esp32dev
+  board: wt32-eth01
   framework:
     type: esp-idf
 
@@ -18,17 +14,28 @@ logger:
 
 # Enable Home Assistant API
 api:
+  reboot_timeout: 0s
 
 ota:
 
-wifi:
+ethernet:
+  type: LAN8720
+  mdc_pin: GPIO23
+  mdio_pin: GPIO18
+  clk_mode: GPIO0_IN
+  phy_addr: 1
+  power_pin: GPIO16
+  use_address: 192.168.25.212
 
-improv_serial:
+time:
+  - platform: homeassistant
+    id: homeassistant_time
 
 i2c:
- sda: 21
- scl: 22
- scan: true
+  sda: 4
+  scl: 2
+  scan: True
+  frequency: 100kHz # Defaults to 50kHz
 
 light:
   - platform: status_led
@@ -56,8 +63,18 @@ number:
       - lambda: 'id(illuminance_sensor).update();'
 
 sensor:
+  - platform: uptime
+    name: ${friendly_name} Uptime
+  - platform: ccs811
+    baseline: 0xD2B5
+    eco2:
+      name: ${friendly_name} eCO2 Value
+    tvoc:
+      name: ${friendly_name} Total Volatile Organic Compound
+    address: 0x5A
+    update_interval: ${global_update_interval}
   - platform: bh1750
-    name: Illuminance
+    name: ${friendly_name} Illuminance
     id: illuminance_sensor
     address: 0x23
     update_interval: ${illuminance_update_interval}
@@ -67,4 +84,4 @@ sensor:
 button:
   - platform: restart
     icon: mdi:power-cycle
-    name: "ESP Reboot"
+    name: ${name} Reboot

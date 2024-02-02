@@ -1,12 +1,12 @@
 substitutions:
-  name: "everything-presence-lite"
-  friendly_name: "Everything Presence Lite"
+  name: "lounge-wt32-eth01"
+  friendly_name: "Lounge"
   illuminance_update_interval: "2s"
   hidden_ssid: "false"
   log_level: DEBUG
 
 dashboard_import:
-  package_import_url: github://everythingsmarthome/everything-presence-lite/everything-presence-lite-ha-no-ble.yaml@main
+  package_import_url: github://jakass202/everything-presence-lite/everything-presence-lite-ha-no-ble.yaml@main
   import_full_config: false # or true
 
 packages:
